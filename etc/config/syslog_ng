@@ -1,0 +1,37 @@
+config syslog-ng 'options'
+        option chain_hostnames 'off'
+        option sync '0'
+        option keep_hostname 'yes'
+        option stats '43200'
+
+config destination
+        option host '10.36.100.102'
+        option type 'tcp'
+        option name 'd_tcp'
+
+config logaction
+        list source 'devlog'
+        list source 'kernel'
+        list source 's_internal'
+        list source 's_udp'
+        option destination 'd_tcp'
+
+config source
+        option type 'unix-stream'
+        option path '/dev/log'
+        option name 'devlog'
+
+config source
+        option type 'internal'
+        option name 's_internal'
+
+config source
+        option name 'kernel'
+        option type 'file'
+        option path '/proc/kmsg'
+        option log_prefix 'kernel: '
+
+config source
+        option type 'udp'
+        option name 's_udp'
+

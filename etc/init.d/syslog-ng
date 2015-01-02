@@ -1,0 +1,28 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2006-2011 OpenWrt.org
+
+START=50
+. /etc/syslog-ng/uciparse
+tmpconf=/tmp/etc/syslog-ng.conf
+
+genconf () {
+        config_load syslog_ng
+        do_options
+        config_foreach do_source source
+        config_foreach do_dest destination
+        config_foreach do_logaction logaction
+        }
+
+start() {
+        genconf >$tmpconf
+        service_start /usr/sbin/syslog-ng -f $tmpconf
+}
+
+stop() {
+        service_stop /usr/sbin/syslog-ng
+}
+
+reload() {
+        service_reload /usr/sbin/syslog-ng
+}
+

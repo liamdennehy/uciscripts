@@ -1,0 +1,79 @@
+#!/bin/sh
+. /lib/functions.sh
+do_source () {
+  s=$1
+  #local name type source log_prefix localip
+  config_get name $s name
+  config_get type $s type
+  case $type in
+    file|unix-stream)
+      config_get path $s path ""
+      [ ! -z "$path" ] && path=\"$path\"
+      source="$type($path"
+      ;;
+    udp|tcp)
+      config_get port $s port 514
+      config_get localip $s localip
+      config_get max_c $s max_connections 10
+      source="$type(port($port)"
+      [ ! -z "$localip" ] && source="$source ip($localip)"
+      [ $type == "tcp" ] && source="$source max_connections($max_c)"
+      ;;
+    internal)
+      source="internal("
+      ;;
+    esac
+  config_get log_prefix $s log_prefix ""
+  if [ ! -z "$log_prefix" ]; then
+    source="$source log_prefix(\"$log_prefix\"));"
+  else
+    source="$source);"
+    fi
+  echo "source $name { $source };"
+  }
+
+do_dest () {
+  d=$1
+  config_get name $d name $d
+  config_get type $d type
+  case $type in
+    udp|tcp)
+      config_get port $d port 514
+      config_get host $d host
+      d="$type(\"$host\" port($port))"
+      echo "destination $name { $d; };"
+      ;;
+    esac
+  }
+
+do_logaction () {
+  l=$1
+  echo "log {"
+  sources="$(uci get syslog_ng.$l.source)"
+  if [ ! -z "$sources" ]; then
+    for s in $(uci get syslog_ng.$l.source); do
+      echo " source($s);"
+      done
+    fi
+  destinations="$(uci get syslog_ng.$l.destination)"
+  if [ ! -z "$destinations" ]; then
+    for d in $destinations; do
+      echo " destination($d);"
+      done
+    fi
+  echo "};"
+  }
+
+do_options () {
+  config_get ch options chain_hostnames off
+  config_get sync options sync off
+  config_get keep_h options keep_hostname yes
+  config_get stats options stats 43200
+  echo "options {"
+  echo " chain_hostnames($ch);"
+  echo " sync($sync);"
+  echo " stats($stats);"
+  echo " keep_hostname($keep_h);"
+  echo "};"
+  }
+
