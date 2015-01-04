@@ -1,0 +1,35 @@
+
+config options 'options'
+	option serverport '5666'
+	option pidfile '/var/run/nrpe.pid'
+	option uid '50'
+	option gid '50'
+
+config command
+	option name 'check_users'
+	option command '/usr/libexec/nagios/check_users'
+	option parameters '-w 3 -c 5'
+
+config allowedhosts
+	list host '192.168.100.4'
+
+config command
+	list name 'check_load'
+	list command '/usr/libexec/nagios/check_load'
+	list parameters '-w 7,4,2 -c 10,5,3'
+
+config command
+	list name 'check_tmp'
+	list command '/usr/libexec/nagios/check_disk'
+	list parameters '-w 50% -c 25% -p /tmp'
+
+config command
+	list name 'check_zombie_procs'
+	list command '/usr/libexec/nagios/check_procs'
+	list parameters '-w 1 -c 3 -s Z'
+
+config command
+	list name 'check_total_procs'
+	list command '/usr/libexec/nagios/check_procs'
+	list parameters '-w 25 -c 30'
+

@@ -1,0 +1,62 @@
+#!/bin/sh
+. /lib/functions.sh
+
+do_ah () { #allowed_hosts
+  h=$1
+  config_get host $h host
+  [ ! -z "$ah" ] && ah="$ah,"
+  ah="$ah$host"
+  }
+
+do_command () {
+  c=$1
+  config_get name $c name
+  config_get cmd $c command
+  config_get parm $c parameters
+  echo "command[$name]=$cmd $parm"
+  }
+
+do_includefile () {
+  f=$1
+  config_get file $f file
+  echo "include=$file"
+  }
+
+do_includedir () {
+  d=$1
+  config_get dir $d dir
+  echo "include_dir=$dir"
+  }
+
+do_options () {
+  unset ah
+  config_get pidfile options pidfile /var/run/nrpe.pid
+  config_get serverport options serverport 5666
+  config_get serveraddress options
+  config_get user options user nagios
+  config_get group options group nagios
+  config_get uid options uid 50
+  config_get gid options gid 50
+  config_get danger options dont_blame_nrpe 0
+  config_get debug options debug 0
+  config_get cmdto options commandtimeour 60
+  config_get connto options connectiontimeout 300
+  config_get weakseed options weakseed 0
+  config_foreach do_ah allowedhosts
+  echo "pid_file=$pidfile"
+  echo "server_port=$serverport"
+  [ ! -z "$serveraddress" ] && echo "server_address=$serveraddress"
+  echo "nrpe_user=$user"
+  echo "nrpe_group=$group"
+  echo "dont_blame_nrpe=$danger"
+  echo "debug=$debug"
+  echo "allowed_hosts=$ah"
+  echo "command_timeout=$cmdto"
+  echo "connection_timeout=$connto"
+  echo "allow_weak_random_seed=$weakseed"
+  config_foreach do_includefile includefile
+  config_foreach do_includedir includedir
+  
+  config_foreach do_command command
+  }
+
