@@ -6,8 +6,7 @@ START=70
 SERVICE_USE_PID=1
 
 start() {
-	config_load nrpe
-	do_options 
+	genconf 
         user_exists $user $uid || user_add $user $uid
 	group_exists $group $gid || group_add $group $gid
 	[ -d $rundir ] || {

@@ -29,19 +29,19 @@ do_includedir () {
   }
 
 do_options () {
-  unset ah
+  local ah
   config_get tmpconf options tmpconf /tmp/etc/nrpe.cfg
-  config_get rundir options rundir
+  config_get rundir options rundir /var/run/nagios
   config_get pidfile options pidfile /var/run/nrpe.pid
   config_get serverport options serverport 5666
-  config_get serveraddress options
+  config_get serveraddress options serveraddress
   config_get user options user nagios
   config_get group options group nagios
   config_get uid options uid 50
   config_get gid options gid 50
   config_get danger options dont_blame_nrpe 0
   config_get debug options debug 0
-  config_get cmdto options commandtimeour 60
+  config_get cmdto options commandtimeout 60
   config_get connto options connectiontimeout 300
   config_get weakseed options weakseed 0
   config_foreach do_ah allowedhosts
