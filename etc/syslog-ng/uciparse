@@ -77,3 +77,17 @@ do_options () {
   echo "};"
   }
 
+genconf () {
+  config_load syslog_ng
+  config_get tmpconf config tmpconf /tmp/etc/syslog-ng.conf
+  config_get debug config debug 0
+  conf="$(
+    do_options
+    config_foreach do_source source
+    config_foreach do_dest destination
+    config_foreach do_logaction logaction
+    )"
+  [ $debug -gt 0 ] && echo "$conf"
+  echo "$conf" >$tmpconf
+  }
+
