@@ -5,7 +5,6 @@ START=50
 . /etc/syslog-ng/uciparse
 
 start() {
-#	config_get tmpconf config tmpconf /tmp/etc/syslog-ng.conf
         genconf
         service_start /usr/sbin/syslog-ng -f $tmpconf
 }
