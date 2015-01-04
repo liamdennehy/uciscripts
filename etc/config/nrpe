@@ -12,14 +12,12 @@ config options 'options'
 	option commandtimeout '60'
 	option connectiontimeout '300'
 	option debug '0'
+	list allowedhosts '192.168.100.4'
 
 config command
 	option name 'check_users'
 	option command '/usr/libexec/nagios/check_users'
 	option parameters '-w 3 -c 5'
-
-config allowedhosts
-	list host '192.168.100.4'
 
 config command
 	list name 'check_load'
@@ -39,7 +37,7 @@ config command
 config command
 	list name 'check_total_procs'
 	list command '/usr/libexec/nagios/check_procs'
-	list parameters '-w 25 -c 30'
+	option parameters '-w 100 -c 120'
 
 config command
 	option name 'check_disk'
@@ -53,4 +51,14 @@ config command
 	option name 'check_proc_ntpd'
 	option command '/usr/libexec/nagios/check_procs'
 	option parameters '-c 1: -C ntpd'
+
+config command
+	option name 'check_syslog_ng_process'
+	option command '/usr/libexec/nagios/check_procs'
+	option parameters '-c 1: -C syslog-ng'
+
+config command
+	option name 'check_proc_dnsmasq'
+	option command '/usr/libexec/nagios/check_procs'
+	option parameters '-c 1: -C dnsmasq'
 
