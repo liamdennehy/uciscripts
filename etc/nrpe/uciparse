@@ -30,6 +30,8 @@ do_includedir () {
 
 do_options () {
   unset ah
+  config_get tmpconf options tmpconf /tmp/etc/nrpe.cfg
+  config_get rundir options rundir
   config_get pidfile options pidfile /var/run/nrpe.pid
   config_get serverport options serverport 5666
   config_get serveraddress options
@@ -43,20 +45,23 @@ do_options () {
   config_get connto options connectiontimeout 300
   config_get weakseed options weakseed 0
   config_foreach do_ah allowedhosts
-  echo "pid_file=$pidfile"
-  echo "server_port=$serverport"
-  [ ! -z "$serveraddress" ] && echo "server_address=$serveraddress"
-  echo "nrpe_user=$user"
-  echo "nrpe_group=$group"
-  echo "dont_blame_nrpe=$danger"
-  echo "debug=$debug"
-  echo "allowed_hosts=$ah"
-  echo "command_timeout=$cmdto"
-  echo "connection_timeout=$connto"
-  echo "allow_weak_random_seed=$weakseed"
-  config_foreach do_includefile includefile
-  config_foreach do_includedir includedir
-  
-  config_foreach do_command command
+  conf="$(
+    echo "pid_file=$pidfile"
+    echo "server_port=$serverport"
+    [ ! -z "$serveraddress" ] && echo "server_address=$serveraddress"
+    echo "nrpe_user=$user"
+    echo "nrpe_group=$group"
+    echo "dont_blame_nrpe=$danger"
+    echo "debug=$debug"
+    echo "allowed_hosts=$ah"
+    echo "command_timeout=$cmdto"
+    echo "connection_timeout=$connto"
+    echo "allow_weak_random_seed=$weakseed"
+    config_foreach do_includefile includefile
+    config_foreach do_includedir includedir
+    config_foreach do_command command
+    )"
+  [ $debug -eq 1 ] && echo "$conf"
+  echo "$conf" >$tmpconf
   }
 

@@ -4,18 +4,17 @@
 START=70
 . /etc/nrpe/uciparse
 SERVICE_USE_PID=1
-tmpconf=/tmp/etc/nrpe.cfg
 
 start() {
 	config_load nrpe
-	do_options
-	user_exists nagios 50 || user_add nagios 50
-	group_exists nagios 50 || group_add nagios 50
-	[ -d /var/run/nagios ] || {
-		mkdir -m 0755 -p /var/run/nagios
-		chown nagios:nagios /var/run/nagios
+	do_options 
+        user_exists $user $uid || user_add $user $uid
+	group_exists $group $gid || group_add $group $gid
+	[ -d $rundir ] || {
+		mkdir -m 0755 -p $rundir
+		chown $user:$group $rundir
 	}
-	service_start /usr/sbin/nrpe -c /tmp/etc/nrpe.cfg -d
+	service_start /usr/sbin/nrpe -c $tmpconf -d
 }
 
 stop() {

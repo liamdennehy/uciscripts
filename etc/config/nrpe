@@ -4,6 +4,11 @@ config options 'options'
 	option pidfile '/var/run/nrpe.pid'
 	option uid '50'
 	option gid '50'
+	option rundir '/var/run/nagios'
+	option tmpconf '/tmp/etc/nrpe.cfg'
+	option user 'nagios'
+	option group 'nagios'
+	option debug '1'
 
 config command
 	option name 'check_users'
@@ -32,4 +37,9 @@ config command
 	list name 'check_total_procs'
 	list command '/usr/libexec/nagios/check_procs'
 	list parameters '-w 25 -c 30'
+
+config command
+	option name 'check_disk'
+	option command '/usr/libexec/nagios/check_disk'
+	option parameters '-w 50% -c 25% -p /overlay'
 
