@@ -7,11 +7,11 @@ config options 'options'
 	option rundir '/var/run/nagios'
 	option user 'nagios'
 	option group 'nagios'
-	option debug '1'
 	option weakseed '0'
 	option dont_blame_nrpe '0'
 	option commandtimeout '60'
 	option connectiontimeout '300'
+	option debug '0'
 
 config command
 	option name 'check_users'
@@ -48,4 +48,9 @@ config command
 
 config config 'config'
 	option tmpconf '/tmp/etc/nrpe.cfg'
+
+config command
+	option name 'check_proc_ntpd'
+	option command '/usr/libexec/nagios/check_procs'
+	option parameters '-c 1: -C ntpd'
 
