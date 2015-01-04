@@ -38,5 +38,5 @@ config source
 
 config config 'config'
 	option tmpconf '/tmp/etc/syslog-ng.conf'
-	option debug '1'
+	option debug '0'
 
