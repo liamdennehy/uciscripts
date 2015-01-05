@@ -1,0 +1,5 @@
+#!/bin/sh
+/usr/local/bin/check_load -r 5
+/usr/local/bin/check_load -r 15
+echo $(uptime |cut -d',' -f1)
+uci get system.@system[0].hostname

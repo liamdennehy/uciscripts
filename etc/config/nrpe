@@ -62,3 +62,50 @@ config command
 	option command '/usr/libexec/nagios/check_procs'
 	option parameters '-c 1: -C dnsmasq'
 
+config command
+	option name 'check_openssl_version'
+	option command '/usr/local/bin/check_openssl_version'
+
+config command
+	option name 'check_mem'
+	option command '/usr/local/bin/check_mem'
+	option parameters '-w 75 -c 90'
+
+config command
+	option name 'get_mem_total'
+	option command '/usr/local/bin/check_mem'
+	option parameters '-r Total'
+
+config command
+	option name 'get_mem_free'
+	option command '/usr/local/bin/check_mem'
+	option parameters '-r Free'
+
+config command
+	option name 'get_mem_used'
+	option command '/usr/local/bin/check_mem'
+	option parameters '-r Used'
+
+config command
+	option name 'get_mem_allcache'
+	option command '/usr/local/bin/check_mem'
+	option parameters '-r AllCache'
+
+config command
+	option name 'mrtg_mem'
+	option command '/usr/local/bin/mrtg_mem'
+
+config command
+	option name 'mrtg_load'
+	option command '/usr/local/bin/mrtg_load'
+
+config command
+	option name 'check_load5'
+	option command '/usr/local/bin/check_load'
+	option parameters '-w 100 -c 200 -i 5'
+
+config command
+	option name 'check_load15'
+	option command '/usr/local/bin/check_load'
+	option parameters '-w 100 -c 200 -i 15'
+

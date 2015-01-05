@@ -1,0 +1,68 @@
+#!/bin/sh
+
+usage() {
+  echo "check_mem v1.1"
+  echo ""
+  echo "Usage:"
+  echo "check_mem -w <warnlevel> -c <critlevel>"
+  echo "check_mem -r <Total|Used|Free|Cache|Buffer>"
+  echo ""
+  echo "warnlevel and critlevel is percentage value without %"
+  echo "Values are percent used"
+  echo ""
+  echo "Copyright (C) 2012 Lukasz Gogolin (lukasz.gogolin@gmail.com)"
+  echo "Copyright (C) 2015 Liam Dennehy (liam.dennehy@gmail.com)"
+  echo "Adapted from source at:"
+  echo "http://exchange.nagios.org/directory/Plugins/System-Metrics/Memory/check_mem-2Esh/details"
+  exit
+}
+
+getvars() {
+  memTotal_k=`grep MemTotal /proc/meminfo |awk '{print $2}'`
+  memFree_k=`grep MemFree /proc/meminfo |awk '{print $2}'`
+  memBuffer_k=`grep Buffers /proc/meminfo |awk '{print $2}'`
+  memCache_k=`grep Cached /proc/meminfo |grep -v Swap |awk '{print $2}'`
+  memUsed_k=$(($memTotal_k-$memFree_k-$memBuffer_k-$memCache_k))
+  memUsedPrc=$((($memUsed_k*100)/$memTotal_k))
+  memFreePrc=$((($memTotal_k-$memUsed_k)*100/$memTotal_k))
+  }
+  
+if [ "$1" = "-w" ] && [ "$2" -gt "0" ] && [ "$3" = "-c" ] && [ "$4" -gt "0" ]; then
+  getvars
+  if [ "$memUsedPrc" -ge "$4" ]; then
+    echo "Memory: CRITICAL Total: $memTotal_k KB - Used: $memUsed_k KB - $memUsedPrc% used!|TOTAL=$memTotal_K;;;; USED=$memUsed_k;;;; CACHE=$memCache_k;;;; BUFFER=$memBuffer_k;;;;"
+    $(exit 2)
+  elif [ "$memUsedPrc" -ge "$2" ]; then
+    echo "Memory: WARNING Total: $memTotal_k MB - Used: $memUsed_k MB - $memUsedPrc% used!|TOTAL=$memTotal_k;;;; USED=$memUsed_k;;;; CACHE=$memCache_k;;;; BUFFER=$memBuffer_k;;;;"
+    $(exit 1)
+  else
+    echo "Memory: OK Total: $memTotal_k MB - Used: $memUsed_k MB - $memUsedPrc% used|TOTAL=$memTotal_k;;;; USED=$memUsed_k;;;; CACHE=$memCache_k;;;; BUFFER=$memBuffer_k;;;;"
+    $(exit 0)
+  fi
+
+elif [ "$1" == "-r" ]; then
+  getvars
+  case "$2" in 
+    Total)
+      echo $memTotal_k
+      ;;
+    Used)
+      echo $memUsed_k
+      ;;
+    Free)
+      echo $memFree_k
+      ;;
+    Cache)
+      echo $memCache_k
+      ;;
+    Buffer)
+      echo $memBuffer_k
+      ;;
+    *)
+      usage
+      ;;
+    esac
+else
+  usage
+fi
+

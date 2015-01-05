@@ -1,0 +1,76 @@
+#!/bin/sh
+
+usage() {
+  echo "Usage:"
+  echo "check_mem -r <1|5|15>"
+  echo "check_mem <-w warn -c crit> [-i [1|5|15]] "
+  echo ""
+  echo "Copyright (C) 2015 Liam Dennehy (liam.dennehy@gmail.com)"
+  exit
+}
+
+do_loadperc () {
+  load=$1
+  if [ "$load" == 0.00 ]; then
+    echo 0
+  else
+    loadl=$(echo $load|cut -d'.' -f1)
+    loadr=$(echo $load|cut -d'.' -f2)
+    [ $(echo $loadr|cut -b1) == "0" ] && loadr=$(echo $loadr|cut -b2)
+    echo $(($loadl*100 + $loadr)) 
+    fi
+  } 
+
+if [ "$1" == "-r" ]; then
+  case "$2" in 
+    1)
+      echo $(do_loadperc $(cat /proc/loadavg |awk '{print $1}'))
+      ;;
+    5)
+      echo $(do_loadperc $(cat /proc/loadavg |awk '{print $2}'))
+      ;;
+    15)
+      echo $(do_loadperc $(cat /proc/loadavg |awk '{print $3}'))
+      ;;
+    *)
+      usage
+      ;;
+    esac
+elif [ "$1" == "-w" ] && [ "$3" == "-c" ]; then
+  crit=$4
+  warn=$2
+  interval=5
+  if [ "$5" == "-i" ]; then
+    case $6 in
+      1)
+        interval=1
+        ;;
+      5)
+        interval=5
+        ;;
+      15)
+        interval=15
+        ;;
+      *)
+        usage
+        ;;
+      esac
+    fi
+  case $interval in
+    1)
+      load=$(do_loadperc $(cat /proc/loadavg |awk '{print $1}'))
+      ;;
+    5)
+      load=$(do_loadperc $(cat /proc/loadavg |awk '{print $2}'))
+      ;;
+    15)
+      load=$(do_loadperc $(cat /proc/loadavg |awk '{print $3}'))
+      ;;
+    esac
+  [ $load -gt $crit ] && echo Load $load Critical && exit 2
+  [ $load -gt $warn ] && echo Load $load Warning $$ exit 1
+  echo Load$interval $load OK && exit 0
+else
+  usage
+  fi
+
