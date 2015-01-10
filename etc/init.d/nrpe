@@ -4,18 +4,18 @@
 START=70
 . /etc/nrpe/uciparse
 SERVICE_USE_PID=1
-
 start() {
-	genconf 
+        genconf
         user_exists $user $uid || user_add $user $uid
-	group_exists $group $gid || group_add $group $gid
-	[ -d $rundir ] || {
-		mkdir -m 0755 -p $rundir
-		chown $user:$group $rundir
-	}
-	service_start /usr/sbin/nrpe -c $tmpconf -d
+        group_exists $group $gid || group_add $group $gid
+        [ -d $rundir ] || {
+                mkdir -m 0777 -p $rundir
+                chown $user:$group $rundir
+        }
+        service_start /usr/sbin/nrpe -c $tmpconf -d
 }
 
 stop() {
-	service_stop /usr/sbin/nrpe
+        service_stop /usr/sbin/nrpe
 }
+

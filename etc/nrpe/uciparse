@@ -1,11 +1,17 @@
 #!/bin/sh
 . /lib/functions.sh
 
+#do_ah () { #allowed_hosts
+#  h=$1
+#  config_get host $h host
+#  [ ! -z "$ah" ] && ah="$ah,"
+#  ah="$ah$host"
+#  }
+
 do_command () {
-  c=$1
-  config_get name $c name
-  config_get cmd $c command
-  config_get parm $c parameters
+  name=$1
+  config_get cmd $1 command
+  config_get parm $1 parameters
   echo "command[$name]=$cmd $parm"
   }
 
@@ -41,6 +47,8 @@ do_options () {
       ah="$ah$host"
       done
     fi
+
+  #config_foreach do_ah allowedhosts
   echo "pid_file=$pidfile"
   echo "server_port=$serverport"
   [ ! -z "$serveraddress" ] && echo "server_address=$serveraddress"
@@ -60,6 +68,7 @@ genconf () {
   config_get tmpconf config tmpconf /tmp/etc/nrpe.cfg
   config_get rundir options rundir /var/run/nagios
   config_get debug options debug 0
+  mkdir -p $(dirname $tmpconf)
   conf="$(
     do_options
     config_foreach do_includefile includefile
@@ -68,4 +77,7 @@ genconf () {
     )"
   [ $debug -eq 1 ] && echo "$conf"
   echo "$conf" >$tmpconf
-  }
+  for p in user uid group gid rundir; do
+  config_get $p options $p
+  done
+}

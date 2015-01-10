@@ -12,100 +12,122 @@ config options 'options'
 	option commandtimeout '60'
 	option connectiontimeout '300'
 	option debug '0'
-	list allowedhosts '192.168.100.4'
-
-config command
-	option name 'check_users'
-	option command '/usr/libexec/nagios/check_users'
-	option parameters '-w 3 -c 5'
-
-config command
-	list name 'check_load'
-	list command '/usr/libexec/nagios/check_load'
-	list parameters '-w 7,4,2 -c 10,5,3'
-
-config command
-	list name 'check_tmp'
-	list command '/usr/libexec/nagios/check_disk'
-	list parameters '-w 50% -c 25% -p /tmp'
-
-config command
-	list name 'check_zombie_procs'
-	list command '/usr/libexec/nagios/check_procs'
-	list parameters '-w 1 -c 3 -s Z'
-
-config command
-	list name 'check_total_procs'
-	list command '/usr/libexec/nagios/check_procs'
-	option parameters '-w 100 -c 120'
-
-config command
-	option name 'check_disk'
-	option command '/usr/libexec/nagios/check_disk'
-	option parameters '-w 50% -c 25% -p /overlay'
+	list allowedhosts '10.36.100.102'
 
 config config 'config'
 	option tmpconf '/tmp/etc/nrpe.cfg'
 
-config command
-	option name 'check_proc_ntpd'
-	option command '/usr/libexec/nagios/check_procs'
-	option parameters '-c 1: -C ntpd'
+config command 'check_users'
+	option command '/usr/libexec/nagios/check_users'
+	option parameters '-w 3 -c 5'
 
-config command
-	option name 'check_syslog_ng_process'
-	option command '/usr/libexec/nagios/check_procs'
-	option parameters '-c 1: -C syslog-ng'
+config command 'check_load'
+	option command '/usr/libexec/nagios/check_load'
+	option parameters '-w 7,4,2 -c 10,5,3'
 
-config command
-	option name 'check_proc_dnsmasq'
+config command 'check_tmp'
+	option command '/usr/libexec/nagios/check_disk'
+	option parameters '-w 50% -c 25% -p /tmp'
+
+config command 'check_zombie_procs'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w :1 -c :2 -Z'
+
+config command 'check_total_procs'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w :40 -c :50'
+
+config command 'check_disk'
+	option command '/usr/libexec/nagios/check_disk'
+	option parameters '-w 50% -c 25% -p /overlay'
+
+config command 'check_proc_ntpclient'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w :1 -c 1: /usr/sbin/ntpclient'
+
+config command 'check_syslog_ng_process'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w :1 -c 1: /usr/sbin/syslog-ng'
+
+config command 'check_proc_dnsmasq'
 	option command '/usr/libexec/nagios/check_procs'
 	option parameters '-c 1: -C dnsmasq'
 
-config command
-	option name 'check_openssl_version'
+config command 'check_openssl_version'
 	option command '/usr/local/bin/check_openssl_version'
 
-config command
-	option name 'check_mem'
+config command 'check_mem'
 	option command '/usr/local/bin/check_mem'
 	option parameters '-w 75 -c 90'
 
-config command
-	option name 'get_mem_total'
+config command 'get_mem_total'
 	option command '/usr/local/bin/check_mem'
 	option parameters '-r Total'
 
-config command
-	option name 'get_mem_free'
+config command 'get_mem_free'
 	option command '/usr/local/bin/check_mem'
 	option parameters '-r Free'
 
-config command
-	option name 'get_mem_used'
+config command 'get_mem_used'
 	option command '/usr/local/bin/check_mem'
 	option parameters '-r Used'
 
-config command
-	option name 'get_mem_allcache'
+config command 'get_mem_allcache'
 	option command '/usr/local/bin/check_mem'
 	option parameters '-r AllCache'
 
-config command
-	option name 'mrtg_mem'
+config command 'mrtg_mem'
 	option command '/usr/local/bin/mrtg_mem'
 
-config command
-	option name 'mrtg_load'
+config command 'mrtg_load'
 	option command '/usr/local/bin/mrtg_load'
 
-config command
-	option name 'check_load5'
+config command 'check_load5'
 	option command '/usr/local/bin/check_load'
 	option parameters '-w 100 -c 200 -i 5'
 
-config command
-	option name 'check_load15'
+config command 'check_load15'
 	option command '/usr/local/bin/check_load'
 	option parameters '-w 100 -c 200 -i 15'
+
+config command 'mrtg_assoclist'
+	option command '/usr/local/bin/mrtg_assoclist'
+
+config command 'mrtg_openvpn_sessions'
+	option command '/usr/local/bin/mrtg_openvpn_sessions'
+
+config command 'check_disk_flash'
+	option command '/usr/local/bin/check_disk'
+	option parameters '-w 75 -c 90 /overlay'
+
+config command 'check_disk_tmp'
+	option command '/usr/local/bin/check_disk'
+	option parameters '-w 75 -c 90 /tmp'
+
+config command 'mrtg_disk'
+	option command '/usr/local/bin/check_disk'
+	option parameters '-m /overlay /tmp'
+
+config command 'mrtg_net_inetdevtap'
+	option command '/usr/local/bin/mrtg_net'
+	option parameters 'inet0'
+
+config command 'check_procs_openvpn'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w :1 -c 1: /usr/sbin/openvpn'
+
+config command 'check_openvpn_client_cert_expiry'
+	option command '/usr/local/bin/check_openssl_expiry'
+	option parameters '-w 20 -c 10 /etc/ssl/openvpn-client.crt'
+
+config command 'mrtg_ssids'
+	option command '/usr/local/bin/mrtg_ssids'
+
+config command 'check_procs_hostapd'
+	option command '/usr/local/bin/check_procs'
+	option parameters '-w 1:1 -c 1:1 hostapd'
+
+config command 'check_ovpn_client_cert'
+	option command '/usr/local/bin/check_ovpn_cert'
+	option parameters 'client'
 
