@@ -12,10 +12,16 @@ start() {
                 mkdir -m 0777 -p $rundir
                 chown $user:$group $rundir
         }
-        service_start /usr/sbin/nrpe -c $tmpconf -d
+        piddir=$(dirname $pidfile)
+	mkdir -p $piddir
+	chown $user $piddir
+	service_start /usr/sbin/nrpe -c $tmpconf -d
 }
 
 stop() {
-        service_stop /usr/sbin/nrpe
+        config_load nrpe
+	config_get pidfile options pidfile /var/run/nrpe/nrpe.pid
+	kill $(cat $pidfile)
+	#service_stop /usr/sbin/nrpe
 }
 
