@@ -4,39 +4,27 @@ config syslog-ng 'options'
 	option sync '0'
 	option keep_hostname 'yes'
 	option stats '43200'
-
-config destination
-	option name 'loghost'
-	option type 'udp'
-	option host '192.168.100.20'
+	option enabled '1'
 
 config logaction
 	list source 'devlog'
 	list source 'kernel'
 	list source 's_internal'
-	list source 's_udp'
 	list destination 'loghost'
 
-config source
+config destination 'loghost'
+	option type 'udp'
+	option host 'nlpxnet01'
+
+config source 'devlog'
 	option type 'unix-stream'
 	option path '/dev/log'
-	option name 'devlog'
 
-config source
+config source 's_internal'
 	option type 'internal'
-	option name 's_internal'
 
-config source
-	option name 'kernel'
+config source 'kernel'
 	option type 'file'
 	option path '/proc/kmsg'
-	option log_prefix 'kernel: '
-
-config source
-	option type 'udp'
-	option name 's_udp'
-
-config config 'config'
-	option tmpconf '/tmp/etc/syslog-ng.conf'
-	option debug '0'
+	option log_prefix 'kernel:'
 

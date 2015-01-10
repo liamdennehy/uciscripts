@@ -2,14 +2,17 @@
 . /lib/functions.sh
 do_source () {
   s=$1
-  #local name type source log_prefix localip
-  config_get name $s name
+  config_get_bool enabled $s enabled 1
+  [ $enabled -eq 0 ] && return 0
+  name=$s
   config_get type $s type
+  config_get log_prefix $s log_prefix ""
+  [ ! -z "$log_prefix" ] && lp=" log_prefix($log_prefix)"
   case $type in
     file|unix-stream)
       config_get path $s path ""
       [ ! -z "$path" ] && path=\"$path\"
-      source="$type($path"
+      source="$type($path$lp)"
       ;;
     udp|tcp)
       config_get port $s port 514
@@ -20,34 +23,36 @@ do_source () {
       [ $type == "tcp" ] && source="$source max_connections($max_c)"
       ;;
     internal)
-      source="internal("
+      source="internal()"
       ;;
     esac
-  config_get log_prefix $s log_prefix ""
-  if [ ! -z "$log_prefix" ]; then
-    source="$source log_prefix(\"$log_prefix\"));"
-  else
-    source="$source);"
-    fi
-  echo "source $name { $source };"
+  echo "source $name { $source; };"
   }
 
 do_dest () {
   d=$1
-  config_get name $d name $d
+  config_get_bool enabled $d enabled 1
+  [ $enabled -eq 0 ] && return 0
+  name=$d
   config_get type $d type
   case $type in
     udp|tcp)
       config_get port $d port 514
       config_get host $d host
       d="$type(\"$host\" port($port))"
-      echo "destination $name { $d; };"
+      ;;
+    file)
+      config_get path $d path
+      d="$type(\"$path\")"
       ;;
     esac
+  echo "destination $name { $d; };"
   }
 
 do_logaction () {
   l=$1
+  config_get_bool enabled $l enabled 1
+  [ $enabled -eq 0 ] && return 0
   echo "log {"
   sources="$(uci get syslog_ng.$l.source)"
   if [ ! -z "$sources" ]; then
@@ -66,7 +71,7 @@ do_logaction () {
 
 do_options () {
   config_get ch options chain_hostnames off
-  config_get sync options sync off
+  config_get sync options sync 0
   config_get keep_h options keep_hostname yes
   config_get stats options stats 43200
   echo "options {"
@@ -78,16 +83,12 @@ do_options () {
   }
 
 genconf () {
-  config_load syslog_ng
-  config_get tmpconf config tmpconf /tmp/etc/syslog-ng.conf
-  config_get debug config debug 0
-  conf="$(
-    do_options
-    config_foreach do_source source
-    config_foreach do_dest destination
-    config_foreach do_logaction logaction
-    )"
-  [ $debug -gt 0 ] && echo "$conf"
-  echo "$conf" >$tmpconf
-  }
+        config_load syslog_ng
+        config_get enabled options enabled 1
+        [ $enabled -eq 0 ] && return 1
+        echo "$(do_options
+        config_foreach do_source source
+        config_foreach do_dest destination
+        config_foreach do_logaction logaction)" >$tmpconf
+        }
 
