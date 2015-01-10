@@ -1,0 +1,14 @@
+#!/bin/sh
+echo $1
+bin=/tmp/sysupgrade.bin
+cat > $bin
+sha=$(cat $bin | openssl sha256|cut -d' ' -f2)
+if [ ! "$sha" == "$1" ]; then
+  echo Hashes mismatch, aborting
+else
+  sysupgrade -T $bin
+  [ $? -ne 0 ] && echo sysupgrade test failed && exit 1
+  echo "Flash!"
+  sysupgrade -n $bin
+  fi 
+
