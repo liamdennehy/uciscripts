@@ -86,7 +86,9 @@ genconf () {
         config_load syslog_ng
         config_get enabled options enabled 1
         [ $enabled -eq 0 ] && return 1
-        echo "$(do_options
+        config_get tmpconf options tmpconf /tmp/etc/syslog-ng.conf
+	mkdir -p $(dirname $tmpconf)
+	echo "$(do_options
         config_foreach do_source source
         config_foreach do_dest destination
         config_foreach do_logaction logaction)" >$tmpconf
