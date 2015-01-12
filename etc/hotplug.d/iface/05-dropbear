@@ -1,15 +1,15 @@
 . /lib/functions.sh
-dropbear_checkinstance () {
+checkinstance () {
   [ $doreload -gt -0 ] && return
   config_get int $1 Interface
   [ -z "$int" ] && return
   if [ "$int" == "$INTERFACE" ]; then
-    logger dropbear is listening on $INTERFACE which just came up, reloading;
+    logger dropbear is listening on $INTERFACE which just changed, reloading;
     doreload=1
     fi
   }
 doreload=0
 config_load dropbear
-config_foreach dropbear_checkinstance dropbear
-logger dropbear iface change, doreload=$doreload
+config_foreach checkinstance dropbear
+logger dropbear iface $INTERFACE change, doreload=$doreload
 [ $doreload -gt 0 ] && /etc/init.d/dropbear reload
